@@ -8,52 +8,54 @@ import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
 1. As a User, I want to see all projects that I have joined.
 
 ## APIs
-| API | Description |
-| --- | ---- |
-| GET /api/v1/projects | Get list of assigned projects |
+| API                  | Description                     |
+| -------------------- | ------------------------------- |
+| GET /api/v1/projects | Get a list of assigned projects |
 
 ## Table schemas
 
 <Accordions type="single">
   <Accordion title="projects">
-    | Column      | Type                                                                        | Not null | Default value     | Description         |
-    | ----------- | --------------------------------------------------------------------------- | -------- | ----------------- | ------------------- |
-    | id          | uuid                                                                        | Y        | uuidv7()          | Project ID          |
-    | name        | varchar(255)                                                                | Y        |                   | Project name        |
-    | description | varchar(255)                                                                |          |                   | Project description |
-    | start_date  | timestamptz                                                                 |          |                   | Project start date  |
-    | end_date    | timestamptz                                                                 |          |                   | Project end date    |
-    | status      | Enum:<br/>- DRAFT<br/>- ACTIVE<br/>- ON_HOLD<br/>- COMPLETED<br/>- ARCHIVED | Y        | DRAFT             | Project status      |
-    | created_at  | timestamptz                                                                 | Y        | clock_timestamp() |                     |
-    | created_by  | varchar(255)                                                                | Y        |                   |                     |
-    | updated_at  | timestamptz                                                                 | Y        | clock_timestamp() |                     |
-    | updated_by  | varchar(255)                                                                | Y        |                   |                     |
+    | Column      | Type                                                                        | Not null | Default value     | Description                                |
+    | ----------- | --------------------------------------------------------------------------- | -------- | ----------------- | ------------------------------------------ |
+    | id          | uuid                                                                        | Y        | uuidv7()          | Project ID                                 |
+    | name        | varchar(255)                                                                | Y        |                   | Project name                               |
+    | description | varchar(255)                                                                |          |                   | Project description                        |
+    | start_date  | timestamptz                                                                 |          |                   | Project start date                         |
+    | end_date    | timestamptz                                                                 |          |                   | Project end date                           |
+    | status      | Enum:<br/>- DRAFT<br/>- ACTIVE<br/>- ON_HOLD<br/>- COMPLETED<br/>- ARCHIVED | Y        | DRAFT             | Project status                             |
+    | created_at  | timestamptz                                                                 | Y        | clock_timestamp() | Timestamp when the record was created      |
+    | created_by  | varchar(255)                                                                | Y        |                   | User who created the record                |
+    | updated_at  | timestamptz                                                                 | Y        | clock_timestamp() | Timestamp when the record was last updated |
+    | updated_by  | varchar(255)                                                                | Y        |                   | User who last updated the record           |
 
     | Constraint | Name          |
     | ---------- | ------------- |
     | PK(id)     | pk_project_id |
   </Accordion>
   <Accordion title="project_roles">
-    | Column     | Type         | Not null | Default value     | Description       |
-    | ---------- | ------------ | -------- | ----------------- | ----------------- |
-    | name       | varchar(255) | Y        |                   | Role name         |
-    | project_id | uuid         | Y        |                   |                   |
-    | created_at | timestamptz  | Y        | clock_timestamp() |                   |
-    | created_by | varchar(255) | Y        |                   |                   |
-    | updated_at | timestamptz  | Y        | clock_timestamp() |                   |
-    | updated_by | varchar(255) | Y        |                   |                   |
+    | Column     | Type         | Not null | Default value     | Description                                |
+    | ---------- | ------------ | -------- | ----------------- | ------------------------------------------ |
+    | id         | uuid         | Y        | uuid7()           | Role ID                                    |
+    | name       | varchar(255) | Y        |                   | Role name                                  |
+    | project_id | uuid         | Y        |                   | Project this role belongs to               |
+    | created_at | timestamptz  | Y        | clock_timestamp() | Timestamp when the record was created      |
+    | created_by | varchar(255) | Y        |                   | User who created the record                |
+    | updated_at | timestamptz  | Y        | clock_timestamp() | Timestamp when the record was last updated |
+    | updated_by | varchar(255) | Y        |                   | User who last updated the record           |
 
     | Constraint                    | Name                  |
     | ----------------------------- | --------------------- |
-    | PK(name, project_id)          | pk_name_project_id    |
+    | PK(id)                        | pk_role_id            |
     | FK(project_id) -> projects.id | fk_project_id         |
+    | UNIQUE(name, project_id)      | uk_name_project_id    |
   </Accordion>
   <Accordion title="project_members">
-    | Column     | Type        | Not null | Default value     | Description       |
-    | ---------- | ----------- | -------- | ----------------- | ----------------- |
-    | project_id | uuid        | Y        |                   |                   |
-    | user_id    | uuid        | Y        |                   |                   |
-    | joined_at  | timestamptz | Y        | clock_timestamp() |                   |
+    | Column     | Type        | Not null | Default value     | Description                                |
+    | ---------- | ----------- | -------- | ----------------- | ------------------------------------------ |
+    | project_id | uuid        | Y        |                   | Project the member belongs to              |
+    | user_id    | uuid        | Y        |                   | User who is a member of the project        |
+    | joined_at  | timestamptz | Y        | clock_timestamp() | Timestamp when the user joined the project |
 
     | Constraint                    | Name                  |
     | ----------------------------- | --------------------- |
@@ -61,11 +63,11 @@ import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
     | FK(user_id) -> users.id       | fk_user_id            |
   </Accordion>
   <Accordion title="project_member_roles">
-    | Column     | Type | Not null | Default value |
-    | ---------- | ---- | -------- | ------------- |
-    | project_id | uuid | Y        |               |
-    | user_id    | uuid | Y        |               |
-    | role_id    | uuid | Y        |               |
+    | Column     | Type | Not null | Default value | Description                              |
+    | ---------- | ---- | -------- | ------------- | ---------------------------------------- |
+    | project_id | uuid | Y        |               | Project this role assignment belongs to  |
+    | user_id    | uuid | Y        |               | User assigned the role                   |
+    | role_id    | uuid | Y        |               | Role assigned to the user in the project |
 
     | Constraint                       | Name                          |
     | -------------------------------- | ----------------------------- |
