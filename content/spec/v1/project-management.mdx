@@ -25,13 +25,27 @@ import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
     | end_date    | timestamptz                                                                 |          |                   | Project end date                           |
     | status      | Enum:<br/>- DRAFT<br/>- ACTIVE<br/>- ON_HOLD<br/>- COMPLETED<br/>- ARCHIVED | Y        | DRAFT             | Project status                             |
     | created_at  | timestamptz                                                                 | Y        | clock_timestamp() | Timestamp when the record was created      |
-    | created_by  | varchar(255)                                                                | Y        |                   | User who created the record                |
+    | created_by  | uuid                                                                        | Y        |                   | User who created the record                |
     | updated_at  | timestamptz                                                                 | Y        | clock_timestamp() | Timestamp when the record was last updated |
-    | updated_by  | varchar(255)                                                                | Y        |                   | User who last updated the record           |
+    | updated_by  | uuid                                                                        | Y        |                   | User who last updated the record           |
 
-    | Constraint | Name          |
-    | ---------- | ------------- |
-    | PK(id)     | pk_project_id |
+    | Constraint                 | Name          |
+    | -------------------------- | ------------- |
+    | PK(id)                     | pk_project_id |
+    | FK(created_by) -> users.id | fk_created_by |
+    | FK(updated_by) -> users.id | fk_updated_by |
+  </Accordion>
+  <Accordion title="project_owners">
+    | Column     | Type         | Not null | Default value     | Description                                |
+    | ---------- | ------------ | -------- | ----------------- | ------------------------------------------ |
+    | project_id | uuid         | Y        |                   | Project ID                                 |
+    | user_id    | uuid         | Y        |                   | User ID                                    |
+
+    | Constraint                    | Name                  |
+    | ----------------------------- | --------------------- |
+    | PK(project_id, user_id)       | pk_project_id_user_id |
+    | FK(project_id) -> projects.id | fk_project_id         |
+    | FK(user_id) -> users.id       | fk_user_id            |
   </Accordion>
   <Accordion title="project_roles">
     | Column     | Type         | Not null | Default value     | Description                                |
@@ -40,14 +54,16 @@ import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
     | name       | varchar(255) | Y        |                   | Role name                                  |
     | project_id | uuid         | Y        |                   | Project this role belongs to               |
     | created_at | timestamptz  | Y        | clock_timestamp() | Timestamp when the record was created      |
-    | created_by | varchar(255) | Y        |                   | User who created the record                |
+    | created_by | uuid         | Y        |                   | User who created the record                |
     | updated_at | timestamptz  | Y        | clock_timestamp() | Timestamp when the record was last updated |
-    | updated_by | varchar(255) | Y        |                   | User who last updated the record           |
+    | updated_by | uuid         | Y        |                   | User who last updated the record           |
 
     | Constraint                    | Name                  |
     | ----------------------------- | --------------------- |
     | PK(id)                        | pk_role_id            |
     | FK(project_id) -> projects.id | fk_project_id         |
+    | FK(created_by) -> users.id    | fk_created_by         |
+    | FK(updated_by) -> users.id    | fk_updated_by         |
     | UNIQUE(name, project_id)      | uk_name_project_id    |
   </Accordion>
   <Accordion title="project_members">
@@ -59,6 +75,7 @@ import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
 
     | Constraint                    | Name                  |
     | ----------------------------- | --------------------- |
+    | PK(project_id, user_id)       | pk_project_id_user_id |
     | FK(project_id) -> projects.id | fk_project_id         |
     | FK(user_id) -> users.id       | fk_user_id            |
   </Accordion>
